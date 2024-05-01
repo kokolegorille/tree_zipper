@@ -19,3 +19,12 @@ Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_do
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at <https://hexdocs.pm/zipper>.
 
+## Test
+
+z = Zipper.new
+z = Zipper.insert(z, Zipper.make_node(%{name: "root"}))
+z = Zipper.append_child(z, Zipper.make_node(%{name: "koko"}))
+z = Zipper.append_child(z, Zipper.make_node(%{name: "kiki"}))
+
+z |> Zipper.traverse() |> Enum.map(& &1.attrs.name)
+["root", "koko", "kiki"]

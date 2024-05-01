@@ -1,6 +1,6 @@
 defmodule TreeZipper.Node do
   defstruct [
-    name: nil,
+    attrs: %{},
     children: []
   ]
 end
