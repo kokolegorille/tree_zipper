@@ -19,6 +19,12 @@ Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_do
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at <https://hexdocs.pm/zipper>.
 
+## Description
+
+https://www.youtube.com/watch?v=6c4DJX2Xr3k
+
+An Elixir implementation of a clojure zipper
+
 ## Test
 
 z = Zipper.new

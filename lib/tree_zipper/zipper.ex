@@ -6,15 +6,14 @@ defmodule TreeZipper.Zipper do
   alias TreeZipper.{Node, Path}
 
   defstruct [
-    node: nil,
-    path: %Path{},
+    node: nil,      # The focus node
+    path: %Path{},  # The location path
   ]
 
   @doc """
   Returns a new zipper
   """
   def new, do: %__MODULE__{}
-
 
   @doc """
   Return a tree from the zipper
@@ -30,10 +29,7 @@ defmodule TreeZipper.Zipper do
     do_children_zippers(first, [])
   end
 
-  defp do_children_zippers(nil, acc) do
-    Enum.reverse(acc)
-  end
-
+  defp do_children_zippers(nil, acc), do: Enum.reverse(acc)
   defp do_children_zippers(zipper, acc) do
     right = right(zipper)
     do_children_zippers(right, [zipper | acc])
@@ -50,6 +46,13 @@ defmodule TreeZipper.Zipper do
     else
       []
     end
+  end
+
+  @doc """
+  Return a zipper from a tree
+  """
+  def from_tree(tree) do
+    %__MODULE__{node: tree}
   end
 
   @doc """
@@ -83,6 +86,8 @@ defmodule TreeZipper.Zipper do
   def has_parent?(%__MODULE__{path: %{pnodes: []}} = _zipper), do: false
   def has_parent?(%__MODULE__{} = _zipper), do: true
   def has_parent?(_), do: false
+
+  def has_children?(%__MODULE__{} = zipper), do: is_branch?(zipper)
 
   def has_next_parent?(%__MODULE__{path: %{ppath: []}} = _zipper), do: false
   def has_next_parent?(%__MODULE__{path: %{ppath: [r: []]}} = _zipper), do: false
