@@ -19,8 +19,13 @@ defmodule TreeZipper.Zipper do
   Return a tree from the zipper
   """
   def to_tree(nil), do: nil
-  def to_tree(%__MODULE__{node: node} = zipper) do
+  # Element node
+  def to_tree(%__MODULE__{node: %{children: _} = node} = zipper) do
     %{node | children: do_build_children(zipper)}
+  end
+  # Leaf node
+  def to_tree(%__MODULE__{node: node} = _zipper) do
+    node
   end
 
   defp children_zippers(zipper) do
@@ -40,8 +45,11 @@ defmodule TreeZipper.Zipper do
       zipper
       |> children_zippers()
       # Map children zippers with a recursive task builder
-      |> Enum.map(fn %{node: node} = child ->
-        %{node | children: do_build_children(child)}
+      |> Enum.map(fn
+        %{node: %{children: _} = node} = child ->
+          %{node | children: do_build_children(child)}
+        %{node: node} ->
+          node
       end)
     else
       []
@@ -76,11 +84,13 @@ defmodule TreeZipper.Zipper do
   # Predicates
 
   def is_branch?(%__MODULE__{node: %{children: []}} = _zipper), do: false
-  def is_branch?(%__MODULE__{} = _zipper), do: true
+  def is_branch?(%__MODULE__{node: %{children: children}} = _zipper) when is_list(children), do: true
   def is_branch?(_), do: false
 
-  def is_leaf?(%__MODULE__{node: %{children: []}} = _zipper), do: true
-  def is_leaf?(%__MODULE__{} = _zipper), do: false
+  # Uncomment if applied to empty element!
+  # def is_leaf?(%__MODULE__{node: %{children: []}} = _zipper), do: true
+  def is_leaf?(%__MODULE__{node: %{children: _}} = _zipper), do: false
+  def is_leaf?(%__MODULE__{} = _zipper), do: true
   def is_leaf?(_), do: false
 
   def has_parent?(%__MODULE__{path: %{pnodes: []}} = _zipper), do: false
