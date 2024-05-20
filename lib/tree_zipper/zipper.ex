@@ -127,8 +127,59 @@ defmodule TreeZipper.Zipper do
     %Node{attrs: attrs}
   end
 
-  def append_child(%__MODULE__{node: node} = zipper, child) do
-    %{zipper | node: %{node | children: node.children ++ [child]}}
+  # def append_child(%__MODULE__{node: node} = zipper, child) do
+  #   %{zipper | node: %{node | children: node.children ++ [child]}}
+  # end
+
+  def append_child(%__MODULE__{} = zipper, child) do
+    %{node: node, path: path} = zipper
+
+    # => Update current node with the new child
+    new_node = %{node | children: node.children ++ [child]}
+
+    %{
+      zipper |
+      node: new_node,
+      path: update_path(path, new_node)
+    }
+  end
+
+  # Do not update the path if pnodes and ppath are empty
+  defp update_path(%{pnodes: [], ppath: []} = path, _node) do
+    path
+  end
+
+  defp update_path(path, node) do
+    %{pnodes: pnodes, ppath: ppath} = path
+
+    # Zip pnodes and ppath, to be updated in the same reducer
+    iterator = Enum.zip(pnodes, ppath)
+
+    # Each steps needs to recalculate the updated node... use reduce
+    {_, new_pnodes, new_ppath} =
+      iterator
+      |> Enum.reduce({node, [], []}, fn {pnode, pp}, {node, pnodes_acc, ppath_acc} ->
+        updated_node = update_node(pnode, node)
+        {
+          updated_node,
+          [updated_node | pnodes_acc],
+          [update_path(pp, updated_node) | ppath_acc]
+        }
+      end)
+
+    # Do not forget to reverse the order
+    %{path | pnodes: Enum.reverse(new_pnodes), ppath: Enum.reverse(new_ppath)}
+  end
+
+  # Update the parent children with the new node
+  # Match on something unique...
+  defp update_node(parent, node) do
+    children = parent.children |> Enum.map(fn
+      child when child.args == node.args -> node
+      child -> child
+    end)
+
+    %{parent | children: children}
   end
 
   def insert(%__MODULE__{} = zipper, node) do
