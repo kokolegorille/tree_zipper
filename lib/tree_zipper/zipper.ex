@@ -217,6 +217,8 @@ defmodule TreeZipper.Zipper do
       [new_node | _] = Enum.reverse(pnodes)
       [new_path | _] = Enum.reverse(ppath)
       %{zipper | node: new_node, path: new_path}
+    else
+      zipper
     end
   end
 
